@@ -189,6 +189,7 @@ int main(int argc, char** argv)
             // turtle.killTurtle("turtle1");
             // turtle.spawnTurtle(5.544444561004639,5.544444561004639,0.0,"turtle1");
             turtle.drawcircle();
+            testing = false;
         }
         
         ros::spinOnce();
