@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <turtlesim/Pose.h>
 #include <turtlesim/Kill.h>
+#include <turtlesim/Spawn.h>
+#include <std_srvs/Empty.h>
+
 
 bool testing = false;  // public 멤버 변수로 선언
 float pose_x , pose_y, pose_theta, distance ; // 현재 위치값
@@ -17,16 +20,27 @@ private:
     ros::NodeHandle nh;
     ros::Publisher turtle_pub;
     ros::Subscriber turtle_position_sub;
-    geometry_msgs::Twist vel_msg;
-    turtlesim::Pose pose_msg;
+    
     ros::Subscriber trigger_sub;
-    ros::ServiceServer kill_sub;
+
+    ros::ServiceClient kill_client;
+    ros::ServiceClient spawn_client;
+    ros::ServiceClient reset_client;
+
+    geometry_msgs::Twist vel_msg;
+
+    turtlesim::Pose pose_msg;
+
 public:
     turtle_time()
     {
         turtle_pub = nh.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel", 10);
         trigger_sub = nh.subscribe("driver_start", 100 , &turtle_time::msgCallback, this);
         turtle_position_sub = nh.subscribe("/turtle1/pose", 1 , &turtle_time::coordinate, this);
+        kill_client = nh.serviceClient<turtlesim::Kill>("/kill");
+        spawn_client = nh.serviceClient<turtlesim::Spawn>("/spawn");
+        reset_client = nh.serviceClient<std_srvs::Empty>("/reset");
+
     }
 
     void msgCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -44,50 +58,37 @@ public:
         pose_theta = coordinate -> theta;
     }
 
-    // 서비스 처리 성공/실패를 반환해야함
-    bool killCallback(turtlesim::Kill::Request& request,turtlesim::Kill::Response& response)
+    void killTurtle(const std::string& turtle_name) 
     {
-        return true;
+        turtlesim::Kill srv;
+        srv.request.name = turtle_name;
+        
+        if (kill_client.call(srv)) {
+            ROS_INFO("Killed turtle: %s", turtle_name.c_str());
+        }
     }
 
-    // void drawCrown()
-    // {
-    //     go_command(2.0,0.0,2.0);
-    
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(0,(PI*0.5),1.0);  // pi/2 360??? pi/8 30도 
+    void resetTurtle() 
+    {
+        std_srvs::Empty srv;
 
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(2.0,0.0,1.5);
+        if (reset_client.call(srv)) {
+            ROS_INFO("reset turtle");
+        }
+    }
 
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(0,(PI*0.66),1.0);  // pi/4 45도 pi/6 대략 30도
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(2.0,0,2.0);
-
-    // while (ros::Time::now() - start_time < ros::Duration(duration))
-    // {
-    //     turtle_pub.publish(vel_msg);
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(0,-(PI*0.33),1.0);  // pi/4 45도 pi/6 대략 30도
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(2.0,0,2.0);
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(0,(PI*0.67),1.0);  // pi/2 360??? pi/8 30도 
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(2.0,0.0,1.5);
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(0,(PI*0.5),1.0);  // pi/2 360??? pi/8 30도 
-
-    //     ros::Duration(2.0).sleep(); // 시작 전 잠시 대기
-    //     go_command(2.0,0.0,2.0);
-
-    // }
+    void spawnTurtle(float x, float y, float theta, const std::string& name) 
+    {
+        turtlesim::Spawn srv;
+        srv.request.x = x;
+        srv.request.y = y;
+        srv.request.theta = theta;
+        srv.request.name = name;
+        
+        if (spawn_client.call(srv)) {
+            ROS_INFO("Spawned turtle: %s", srv.response.name.c_str());
+        }
+    }
 
     void drawCrown()
     {
@@ -182,7 +183,12 @@ int main(int argc, char** argv)
         if(testing)
         {
             turtle.drawCrown();
-            // turtle.drawcircle();
+            ros::Duration(2.0);
+            turtle.resetTurtle();
+
+            // turtle.killTurtle("turtle1");
+            // turtle.spawnTurtle(5.544444561004639,5.544444561004639,0.0,"turtle1");
+            turtle.drawcircle();
         }
         
         ros::spinOnce();
