@@ -190,8 +190,8 @@ int main(int argc, char** argv)
     
         }
 
-    ros::spinOnce();
-    rate.sleep();
+    // ros::spinOnce();
+    // rate.sleep();
     
     ros::spin(); // 반복해서 callback을 호출함
     // ros::spinOnce();
