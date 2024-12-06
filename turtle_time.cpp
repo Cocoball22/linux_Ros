@@ -176,27 +176,19 @@ int main(int argc, char** argv)
 
     printf("main: %d \n\r",testing);
 
-        while(ros::ok()) // roscore가 실행 되는 동안
+    while(ros::ok()) // roscore가 실행 되는 동안
+    {
+        printf(" in while test : %d\n\r", testing);
+        if(testing)
         {
-            printf(" in while test : %d\n\r", testing);
-            if(testing)
-            {
-                turtle.drawCrown();
-                // turtle.drawcircle();
-            }
-            //ros::spin(); // 반복해서 callback을 호출함
-            ros::spinOnce();
-            rate.sleep();
-    
+            turtle.drawCrown();
+            // turtle.drawcircle();
         }
-
-    // ros::spinOnce();
-    // rate.sleep();
-    
-    ros::spin(); // 반복해서 callback을 호출함
-    // ros::spinOnce();
-    // rate.sleep();
-
+        
+        ros::spinOnce();
+        rate.sleep();
+        // ros::spin(); // 여기서 while로 묶여있고 데이터는 지속적으로 반복해서 반환을 하지만 printf문으로 넘어가지를 않는다.
+    }
     
     return 0;
 }
