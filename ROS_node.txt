@@ -1,0 +1,41 @@
+ROS Node  생성
+
+mkdir catkin_ws
+cd catkin_ws 
+mkdir src
+cd src 
+catkin_create pkg [패키지 이름] [의존성 패키지]
+catkin_create pkg basic_tutorial roscpp
+
+cd src 
+nano basic.cpp  cpp 파일 생성
+
+#include <ros/ros.h>
+
+
+int main(int argc, char **argv)
+{
+   ROS_INFO("Hello World");
+   ros::init(argc, argv. “basic_node”); -> rosnode list를 입력했을때 나타나는 그 노드 이름
+   ros::NodeHandle n; -> topic 이나 service node 등으로 확장
+
+  ros::Rate 노드가 몇 hz로 동작할것인지 정함
+
+while(ros::ok()) -> 노드가 종료 되었을시 false를 반환
+{
+    ros::spinOnce();
+    loop_rate.sleep(); ---> 무한 반복문에서 loop_rate.sleep()선언 되면 정의한 Hz가 될 때까지 기다렸다가 다음으로 넘어감
+}
+    
+    return 0;
+}
+
+ctrl + O로 파일 저장
+ctrl + x로 나가기
+
+cmakelist.txt 파일에 내가 작성한 cpp 파일 정보를 입력
+
+include_directories(~~~~) 아래에
+
+add_executable(basic_node src/basic.cpp)
+target_link_
