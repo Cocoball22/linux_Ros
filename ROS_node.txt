@@ -37,5 +37,28 @@ cmakelist.txt 파일에 내가 작성한 cpp 파일 정보를 입력
 
 include_directories(~~~~) 아래에
 
-add_executable(basic_node src/basic.cpp)
-target_link_
+add_executable(basic_node src/basic.cpp) 
+target_link_libraries(basic_node ${catkin_LIBRARIES)}
+
+catkin_make => 소스 파일 컴파일
+
+
+ROS 환경 구조
+
+워크 스페이스 -> catkin_ws
+
+
+rospack fine 패키지 이름 ros패키지 찾기
+내가 수행한 결과물은 devel 폴더 내에 존재 실행파일은 lib 폴더안에 패키지 이름의 폴더 아래에 존재 ./명령어를 통해서 실행가능
+rosrun 명령어는 실행파일을 쉽게 찾는다
+
+ros 설치된 경로 opt/ros/noetic 이 안에 turtlesim 패키지가 존재
+
+노드를 실행하기 전 입력하는 명령어가 있다 source devel/setup.bash -> ros 패키지 경로를 설정하는 명령어
+~/bashrc에 등록하면 터미널 실행시 자동으로 입력되어 매번 입력해야 하는 번거로움을 줄일 수 있다
+source ~/catkin_ws/devel/setup.bash
+
+ROS 패키지 경로는 어떻게 만들어지는가?
+ROS 패키지경로를 설정하는 환경설정 명령어 export |grep ROS
+
+ROS Topic 이란:: ROS에서 Node와 Node 사이에 연속적으로 데이터를 주고 받을 수 있는 방법 중 하나
